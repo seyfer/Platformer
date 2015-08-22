@@ -35,8 +35,8 @@ public class Player
     public Player(TileMap tileMap) {
         this.tileMap = tileMap;
 
-        width = 20;
-        height = 20;
+        width = 22;
+        height = 22;
 
         moveSpeed = 0.6;
         maxSpeed = 4.2;
@@ -85,15 +85,15 @@ public class Player
         int rightTile = tileMap.getColTile((int) (x + width / 2) - 1);
         int topTile = tileMap.getRowTile((int) (y - height / 2));
         int bottomTile = tileMap.getRowTile((int) (y + height / 2) - 1);
-        topLeft = tileMap.getTile(topTile, leftTile) == 0;
-        topRight = tileMap.getTile(topTile, rightTile) == 0;
-        bottomLeft = tileMap.getTile(bottomTile, leftTile) == 0;
-        bottomRight = tileMap.getTile(bottomTile, rightTile) == 0;
+        topLeft = tileMap.isBlocked(topTile, leftTile);
+        topRight = tileMap.isBlocked(topTile, rightTile);
+        bottomLeft = tileMap.isBlocked(bottomTile, leftTile);
+        bottomRight = tileMap.isBlocked(bottomTile, rightTile);
     }
 
     public void update() {
 
-        //determine next position
+        // determine next position
         if (left) {
             dx -= moveSpeed;
             if (dx < -maxSpeed) {
@@ -133,12 +133,13 @@ public class Player
             dy = 0;
         }
 
-        //check collisions
+        // check collisions
         int currCol = tileMap.getColTile((int) x);
         int currRow = tileMap.getRowTile((int) y);
 
         double tox = x + dx;
         double toy = y + dy;
+
         double tempx = x;
         double tempy = y;
 
@@ -151,7 +152,6 @@ public class Player
                 tempy += dy;
             }
         }
-
         if (dy > 0) {
             if (bottomLeft || bottomRight) {
                 dy = 0;
@@ -171,7 +171,6 @@ public class Player
                 tempx += dx;
             }
         }
-
         if (dx > 0) {
             if (topRight || bottomRight) {
                 dx = 0;
@@ -191,7 +190,7 @@ public class Player
         x = tempx;
         y = tempy;
 
-        //move the map
+        // move the map
         tileMap.setX((int) (GamePanel.WIDTH / 2 - x));
         tileMap.setY((int) (GamePanel.HEIGHT / 2 - y));
     }

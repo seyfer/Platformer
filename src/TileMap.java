@@ -1,8 +1,7 @@
+import javax.imageio.ImageIO;
 import java.awt.*;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.net.URI;
 
 /**
@@ -17,6 +16,9 @@ public class TileMap
     private int[][] map;
     private int mapWidth;
     private int mapHeight;
+
+    private BufferedImage tileset;
+    private Tile[][] tiles;
 
     public TileMap(String s, int tileSize) {
 
@@ -37,7 +39,7 @@ public class TileMap
 
             map = new int[mapHeight][mapWidth];
 
-            String delimiters = " ";
+            String delimiters = "\\s+";
             for (int row = 0; row < mapHeight; row++) {
                 String line = br.readLine();
                 String tokens[] = line.split(delimiters);
@@ -47,9 +49,35 @@ public class TileMap
             }
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
 
+    }
+
+    public void loadTiles(String s) {
+        try {
+            tileset = ImageIO.read(new File(s));
+            int numTilesAcross = (tileset.getWidth() + 1) / (tileSize + 1);
+            tiles = new Tile[2][numTilesAcross];
+
+            BufferedImage subimage;
+            for (int col = 0; col < numTilesAcross; col++) {
+                subimage = tileset.getSubimage(
+                        col * tileSize + col,
+                        0,
+                        tileSize, tileSize
+                );
+                tiles[0][col] = new Tile(subimage, false);
+                subimage = tileset.getSubimage(
+                        col * tileSize + col,
+                        tileSize + 1,
+                        tileSize, tileSize
+                );
+                tiles[1][col] = new Tile(subimage, true);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public int getColTile(int x) {
@@ -62,6 +90,13 @@ public class TileMap
 
     public int getTile(int row, int col) {
         return map[row][col];
+    }
+
+    public boolean isBlocked(int row, int col) {
+        int rc = map[row][col];
+        int r = rc / tiles[0].length;
+        int c = rc % tiles[0].length;
+        return tiles[r][c].isBlocked();
     }
 
     public int getTileSize() {
@@ -93,15 +128,26 @@ public class TileMap
             for (int col = 0; col < mapWidth; col++) {
                 int rc = map[row][col];
 
-                if (rc == 0) {
-                    g.setColor(Color.BLACK);
-                }
+//                if (rc == 0) {
+//                    g.setColor(Color.BLACK);
+//                }
+//
+//                if (rc == 1) {
+//                    g.setColor(Color.WHITE);
+//                }
+//
+//                g.fillRect(x + col * tileSize, y + row * tileSize, tileSize, tileSize);
 
-                if (rc == 1) {
-                    g.setColor(Color.WHITE);
-                }
+                int r = rc / tiles[0].length;
+                int c = rc % tiles[0].length;
 
-                g.fillRect(x + col * tileSize, y + row * tileSize, tileSize, tileSize);
+                g.drawImage(
+                        tiles[r][c].getImage(),
+                        x + col * tileSize,
+                        y + row * tileSize,
+                        null
+                );
+
             }
         }
     }

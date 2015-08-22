@@ -66,7 +66,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener
             try {
                 Thread.sleep(waitTime);
             } catch (Exception e) {
-                System.out.println(e.getMessage());
+                e.printStackTrace();
             }
         }
 
@@ -77,7 +77,9 @@ public class GamePanel extends JPanel implements Runnable, KeyListener
         image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
         g = (Graphics2D) image.getGraphics();
 
-        tileMap = new TileMap("testmap.txt", 32);
+        tileMap = new TileMap("testmap2.txt", 32);
+        tileMap.loadTiles("tileset.gif");
+
         player = new Player(tileMap);
         player.setX(50);
         player.setY(50);
@@ -89,6 +91,10 @@ public class GamePanel extends JPanel implements Runnable, KeyListener
     }
 
     private void render() {
+
+        g.setColor(Color.BLACK);
+        g.fillRect(0, 0, WIDTH, HEIGHT);
+
         tileMap.draw(g);
         player.draw(g);
     }
