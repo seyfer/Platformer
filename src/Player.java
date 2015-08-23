@@ -1,4 +1,7 @@
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
 
 /**
  * Created by seyfer on 22.08.15.
@@ -32,6 +35,13 @@ public class Player
     private boolean bottomLeft;
     private boolean bottomRight;
 
+    private Animation animation;
+    private BufferedImage[] idleSprites;
+    private BufferedImage[] walkingSprites;
+    private BufferedImage[] jumpingSprites;
+    private BufferedImage[] fallingSprites;
+    private boolean facingLeft;
+
     public Player(TileMap tileMap) {
         this.tileMap = tileMap;
 
@@ -44,6 +54,32 @@ public class Player
         stopSpeed = 0.30;
         jumpStart = -11;
         gravity = 0.64;
+
+        try {
+            idleSprites = new BufferedImage[1];
+            jumpingSprites = new BufferedImage[1];
+            fallingSprites = new BufferedImage[1];
+            walkingSprites = new BufferedImage[6];
+
+            idleSprites[0] = ImageIO.read(new File("graphics/player/kirbyidle.gif"));
+            jumpingSprites[0] = ImageIO.read(new File("graphics/player/kirbyfall.gif"));
+            fallingSprites[0] = ImageIO.read(new File("graphics/player/kirbyjump.gif"));
+
+            BufferedImage image = ImageIO.read(new File("graphics/player/kirbywalk.gif"));
+            for (int i = 0; i < walkingSprites.length; i++) {
+                walkingSprites[i] = image.getSubimage(
+                        i * width + i,
+                        0,
+                        width,
+                        height
+                );
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        animation = new Animation();
+        facingLeft = false;
     }
 
     public void setX(double x) {
@@ -193,17 +229,60 @@ public class Player
         // move the map
         tileMap.setX((int) (GamePanel.WIDTH / 2 - x));
         tileMap.setY((int) (GamePanel.HEIGHT / 2 - y));
+
+        //sprite animation
+        if (left || right) {
+            animation.setFrames(walkingSprites);
+            animation.setDelay(100);
+        } else {
+            animation.setFrames(idleSprites);
+            animation.setDelay(-1);
+        }
+        if (dy < 0) {
+            animation.setFrames(jumpingSprites);
+            animation.setDelay(-1);
+        }
+        if (dy > 0) {
+            animation.setFrames(fallingSprites);
+            animation.setDelay(-1);
+        }
+
+        animation.update();
+        if (dx < 0) {
+            facingLeft = true;
+        }
+        if (dx > 0) {
+            facingLeft = false;
+        }
+
     }
 
     public void draw(Graphics2D g) {
         int tx = tileMap.getX();
         int ty = tileMap.getY();
 
-        g.setColor(Color.RED);
-        g.fillRect(
-                (int) (tx + x - width / 2),
-                (int) (ty + y - height / 2),
-                width, height
-        );
+        if (facingLeft) {
+            g.drawImage(
+                    animation.getImage(),
+                    (int) (tx + x - width / 2),
+                    (int) (ty + y - height / 2),
+                    null
+            );
+        } else {
+            g.drawImage(
+                    animation.getImage(),
+                    (int) (tx + x - width / 2 + width),
+                    (int) (ty + y - height / 2),
+                    -width, height, null
+            );
+        }
+
+        //red
+//        g.setColor(Color.RED);
+//        g.fillRect(
+//                (int) (tx + x - width / 2),
+//                (int) (ty + y - height / 2),
+//                width, height
+//        );
     }
 }

@@ -77,8 +77,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener
         image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
         g = (Graphics2D) image.getGraphics();
 
-        tileMap = new TileMap("testmap2.txt", 32);
-        tileMap.loadTiles("tileset.gif");
+        tileMap = new TileMap("map/testmap2.txt", 32);
+        tileMap.loadTiles("graphics/tileset.gif");
 
         player = new Player(tileMap);
         player.setX(50);

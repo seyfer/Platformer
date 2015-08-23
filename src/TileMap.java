@@ -20,6 +20,11 @@ public class TileMap
     private BufferedImage tileset;
     private Tile[][] tiles;
 
+    private int minx;
+    private int miny;
+    private int maxx = 0;
+    private int maxy = 0;
+
     public TileMap(String s, int tileSize) {
 
         this.tileSize = tileSize;
@@ -38,6 +43,9 @@ public class TileMap
             mapHeight = Integer.parseInt(br.readLine());
 
             map = new int[mapHeight][mapWidth];
+
+            minx = GamePanel.WIDTH - mapWidth * tileSize;
+            miny = GamePanel.HEIGHT - mapHeight * tileSize;
 
             String delimiters = "\\s+";
             for (int row = 0; row < mapHeight; row++) {
@@ -109,6 +117,12 @@ public class TileMap
 
     public void setX(int x) {
         this.x = x;
+        if (x < minx) {
+            this.x = minx;
+        }
+        if (x > maxx) {
+            this.x = maxx;
+        }
     }
 
     public int getY() {
@@ -117,6 +131,12 @@ public class TileMap
 
     public void setY(int y) {
         this.y = y;
+        if (y < miny) {
+            this.y = miny;
+        }
+        if (y > maxy) {
+            this.y = maxy;
+        }
     }
 
     public void update() {
